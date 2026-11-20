@@ -17,8 +17,7 @@ A port of LinuxDoom 1.10 to the V.Flash's ARM926EJ-S processor. The engine runs 
 From the extracted folder, run these two commands, adjusting the paths to your setup:
 
 ```sh
-python3 tools/pack_wad.py doom-vflash-engine.elf doom1.wad doom-vflash.elf
-python3 tools/run_flashem.py /path/to/flashem doom-vflash.elf
+python tools/run_flashem.py "C:\Users\USERNAME\LOCATION\doom-vflash\flashem\flashem.exe" doom-vflash.elf
 ```
 
 On Windows, point to `flashem.exe` and use `py -3` instead of `python3` if needed. Wrap any path containing spaces in quotes.
