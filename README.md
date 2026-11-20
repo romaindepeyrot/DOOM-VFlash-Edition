@@ -1,80 +1,72 @@
-# DOOM on VTech V.Flash
+# DOOM sur VTech V.Flash
 
-A port of LinuxDoom 1.10 to the V.Flash's ARM926EJ-S processor. The engine runs inside the console as emulated by FlashEm. This repository contains the port's sources, a prebuilt ARM engine and two Python helper scripts.
+Portage de LinuxDoom 1.10 pour le processeur ARM926EJ-S de la V.Flash. Le moteur
+tourne dans la console émulée par FlashEm. L’archive contient les sources du
+port, le moteur ARM précompilé et deux scripts Python.
 
-> **Status:** the only validated target is loading the ELF in standalone FlashEm. Booting from a disc or on a physical console is untested.
+## Lancer le jeu
 
-## Quick start
+Il faut Python 3, l’exécutable autonome **FlashEm** avec l’option `--load` et
+un fichier de données **IWAD**. Le port a été testé avec `doom1.wad` de DOOM
+shareware 1.9. L’archive contient le moteur et le code de portage. Fournissez
+votre propre IWAD.
 
-### Requirements
-
-- Python 3
-- The standalone **FlashEm** executable with `--load` support
-- A Doom **IWAD** data file. The port was tested with `doom1.wad` from DOOM shareware 1.9. The IWAD is **not** included, so you need to provide your own.
-
-### Run
-
-From the extracted folder, run these two commands, adjusting the paths to your setup:
+Depuis le dossier extrait, lancez ces deux commandes en adaptant les chemins.
 
 ```sh
 python3 tools/pack_wad.py doom-vflash-engine.elf doom1.wad doom-vflash.elf
-python3 tools/run_flashem.py /path/to/flashem doom-vflash.elf
+python3 tools/run_flashem.py /chemin/vers/flashem doom-vflash.elf
 ```
 
-On Windows, point to `flashem.exe` and use `py -3` instead of `python3` if needed. Wrap any path containing spaces in quotes.
+Sous Windows, utilisez le chemin de `flashem.exe`. Vous pouvez remplacer
+`python3` par `py -3` si nécessaire. Si un chemin contient des espaces, mettez-le
+entre guillemets.
 
-What the scripts do:
+Le premier script assemble un ELF avec le moteur et l’IWAD, dans la limite
+des 16 Mio de RAM de la console. Le second lance l’ELF et fournit à FlashEm un
+fichier d’amorçage minimal temporaire. Les journaux du jeu sortent dans le
+terminal par l’UART 1 émulé.
 
-1. `pack_wad.py` builds a single ELF containing the engine and the IWAD, within the console's 16 MiB of RAM.
-2. `run_flashem.py` launches that ELF and gives FlashEm a minimal temporary boot file.
+## Commandes
 
-Game logs are printed to your terminal through the emulated UART 1.
-
-## Controls
-
-| Action | V.Flash controller | Default FlashEm keyboard |
+| Action | Manette V.Flash | Clavier FlashEm par défaut |
 | --- | --- | --- |
-| Move forward/backward and turn | D-pad | Arrow keys |
-| Fire | Red | Z |
-| Open a door / confirm | Green | C |
-| Change weapon | Yellow | X |
-| Automap / back in menus | Blue | V |
-| Open menu / confirm | Enter | Enter |
-| Cancel / return to game | Exit | Backspace |
-| Strafe | Left and right triggers | Q and W |
-| Help and pause | Question and Book | H and B |
+| Avancer, reculer et tourner | Direction | Flèches |
+| Tirer | Rouge | Z |
+| Ouvrir une porte ou confirmer | Vert | C |
+| Changer d’arme | Jaune | X |
+| Carte ou retour dans les menus | Bleu | V |
+| Ouvrir le menu ou confirmer | Enter | Entrée |
+| Annuler ou revenir au jeu | Exit | Retour arrière |
+| Pas latéral | Gâchettes gauche et droite | Q et W |
+| Aide et pause | Question et Livre | H et B |
 
-## Features and limitations
+Vous pouvez sauvegarder et recharger via le menu. Les sauvegardes sont
+conservées en RAM pendant la session. Le moteur produit les effets sonores PCM
+en stéréo. La musique et le multijoueur restent hors de ce portage. La cible
+validée est le chargement ELF dans FlashEm autonome. Le démarrage depuis un
+disque ou sur une console physique reste à vérifier.
 
-- Save and load from the in-game menu. Saves are kept in RAM for the current session only.
-- Stereo PCM sound effects.
-- No music.
-- No multiplayer.
-- Tested in standalone FlashEm only. Disc boot and real hardware are still to be verified.
+## Recompiler le moteur
 
-## Building the engine
-
-### Requirements
-
-- GNU Make
-- An `arm-none-eabi` GNU toolchain with newlib
-- Python 3
-
-On Debian, install `gcc-arm-none-eabi`, `binutils-arm-none-eabi` and `libnewlib-arm-none-eabi`.
-
-### Build
+Installez GNU Make, une chaîne ARM GNU `arm-none-eabi` avec newlib et Python 3.
+Sous Debian, les paquets utiles sont `gcc-arm-none-eabi`,
+`binutils-arm-none-eabi` et `libnewlib-arm-none-eabi`.
 
 ```sh
 make -j
-make game WAD="/path/to/doom1.wad"
+make game WAD="/chemin/vers/doom1.wad"
 ```
 
-The engine is written to `build/doom-vflash-engine.elf`, and the second command generates `build/doom-vflash.elf`. Set `CROSS_COMPILE` to use a different toolchain prefix.
+Le moteur est produit dans `build/doom-vflash-engine.elf`. La seconde commande
+génère `build/doom-vflash.elf`. `CROSS_COMPILE` peut désigner un autre préfixe
+de chaîne de compilation.
 
-## Credits and license
+Le moteur est tiré de la publication GPL de LinuxDoom 1.10 par id Software,
+au commit `a77dfb96cb91780ca334d0d4cfd86957558007e0`. Voir
+[COPYING](COPYING) et le [dépôt d’id Software](https://github.com/id-Software/DOOM).
 
-The engine is derived from id Software's GPL release of LinuxDoom 1.10, at commit `a77dfb96cb91780ca334d0d4cfd86957558007e0`. See [COPYING](COPYING) and the [id Software repository](https://github.com/id-Software/DOOM).
-
-The port was tested against FlashEm at commit `cb771f893f6a7e0a9c79adbe1081a0d49be3f44b`. The [FlashEm repository](https://github.com/WizzardSK/flashem-libretro) contains the emulator and its build instructions.
-
-DOOM is a trademark of id Software. This project does not distribute any game data, so you must supply your own IWAD.
+Le port a été testé avec FlashEm au commit
+`cb771f893f6a7e0a9c79adbe1081a0d49be3f44b`, fourni dans l’archive de référence.
+Le [dépôt de FlashEm](https://github.com/WizzardSK/flashem-libretro) contient
+l’émulateur et ses instructions de compilation.
